@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BetManager Pro</title>
+<style>
+:root {
+    --primary: #1e3799;
+    --secondary: #4a69bd;
+    --success: #00b894;
+    --danger: #d63031;
+    --void: #f39c12;
+    --pending: #6c757d;
+    --bg: #f5f6fa;
+    --card-bg: #ffffff;
+    --text-dark: #2d3436;
+    --text-muted: #636e72;
+    --border: #dcdde1;
+}
+body.dark {
+    --primary: #5e8bff;
+    --secondary: #7ba7ff;
+    --success: #00e5a0;
+    --danger: #ff6b7a;
+    --void: #ffc14d;
+    --bg: #0f1117;
+    --card-bg: #1a1d27;
+    --text-dark: #e8ecf0;
+    --text-muted: #8892a4;
+    --border: #2a2f3e;
+}
+body.dark nav { box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+body.dark input, body.dark select { background: #13151f; color: var(--text-dark); border-color: var(--border); }
+body.dark input:focus, body.dark select:focus { background: #1a1d27; }
+body.dark input[readonly] { background: #0d0f17; }
+body.dark .bank-card { background: linear-gradient(135deg, #162060, #2a3a7a); }
+body.dark .stake-box { background: #13172a; border-color: var(--secondary); }
+body.dark .history-item { background: #1a1d27; }
+body.dark .counters { background: #1a1d27; }
+body.dark .combi-sel-card { background: #13151f; }
+body.dark .combi-summary { background: linear-gradient(135deg, #13172a, #1a1d27); }
+body.dark .consejo-card { background: #13172a; }
+body.dark .consejo-card.warning { background: #1f1a0f; }
+body.dark .consejo-card.danger { background: #1f0f0f; }
+body.dark .consejo-card.success { background: #0f1f18; }
+body.dark .edu-item { background: #1a1d27; }
+body.dark .analisis-bar-track { background: #2a2f3e; }
+body.dark .combi-picks { background: #13151f; }
+body.dark .section-title { background: #13172a; }
+body.dark textarea { background: #13151f; color: var(--text-dark); border-color: var(--border); }
+body.dark textarea:focus { background: #1a1d27; border-color: var(--primary); }
+body.dark .best-worst-card { background: #13151f; }
+body.dark nav button:hover { background: #13172a; }
+body.dark nav button.active-nav { background: #13172a; }
+body.dark .filters button { background: var(--border); color: var(--text-dark); }
+* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text-dark); padding: 10px; display: flex; justify-content: center; }
+#app-container { width: 100%; max-width: 500px; padding-bottom: 40px; }
+
+/* NAV */
+nav { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; background: var(--card-bg); padding: 10px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); }
+nav button { flex: 1; min-width: 70px; background: none; border: none; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); padding: 8px 4px; cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+nav button:hover { background: #f0f4ff; color: var(--primary); }
+nav button.active-nav { background: #e8eeff; color: var(--primary); }
+.logout-btn { color: var(--danger) !important; }
+
+/* VISTAS */
+.view { display: none; animation: fadeIn 0.3s ease; }
+.view.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* CARDS */
+.card { background: var(--card-bg); padding: 20px; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.app-title { text-align: center; color: var(--primary); font-size: 1.8rem; margin-bottom: 8px; font-weight: 800; letter-spacing: -0.5px; }
+.app-subtitle { text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 20px; }
+
+/* BANKROLL */
+.bank-card { background: linear-gradient(135deg, #1e3799, #4a69bd); color: white; text-align: center; }
+.bank-card small { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.8; }
+.bank-card h2 { font-size: 2.4rem; margin: 6px 0 14px; font-weight: 800; }
+.bank-setup { background: rgba(255,255,255,0.12); padding: 12px; border-radius: 10px; }
+.bank-tip { font-size: 0.78rem; text-align: left; opacity: 0.85; margin-bottom: 10px; line-height: 1.5; }
+
+/* FORMS */
+label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+input, select { width: 100%; padding: 11px 12px; margin-bottom: 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: #fafafa; color: var(--text-dark); transition: border-color 0.2s; }
+input:focus, select:focus { outline: none; border-color: var(--primary); background: white; }
+input[readonly] { background: #eef2f5; font-weight: 700; color: var(--primary); }
+hr { border: 0; border-top: 1px solid var(--border); margin: 14px 0; }
+.row { display: flex; gap: 10px; align-items: flex-end; }
+.col { flex: 1; }
+.section-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); background: #eef2ff; padding: 6px 12px; border-radius: 6px; margin-bottom: 14px; }
+
+/* STAKE BOX */
+.stake-box { background: #f0f4ff; padding: 14px; border-radius: 10px; border: 1.5px dashed var(--secondary); margin-bottom: 14px; }
+.stake-box label { color: var(--primary); font-size: 0.85rem; margin-bottom: 6px; }
+.stake-box input[type="range"] { margin: 8px 0; accent-color: var(--primary); }
+.auto-calc { font-size: 0.82rem; color: var(--primary); text-align: center; }
+
+/* DYNAMIC */
+#fb-dynamic-container:not(:empty),
+#nba-dynamic-container:not(:empty) {
+    background: #f8f9ff;
+    padding: 14px;
+    border-left: 3px solid var(--primary);
+    margin-bottom: 14px;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+/* BUTTONS */
+button { width: 100%; padding: 13px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: opacity 0.2s, transform 0.1s; }
+button:hover { opacity: 0.9; }
+button:active { transform: scale(0.98); }
+.btn-secondary { background: #dfe4ea; color: var(--text-dark); }
+.btn-success { background: var(--success); }
+.btn-danger { background: var(--danger); }
+.btn-text { background: none; color: var(--text-muted); text-decoration: underline; font-size: 0.85rem; padding: 8px; }
+
+/* STATS HEADER */
+.stats-header { display: flex; justify-content: space-between; text-align: center; }
+.stat-col { flex: 1; }
+.stat-col b { display: block; font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+.stat-col span { font-size: 1.2rem; font-weight: 800; color: var(--primary); }
+
+/* COUNTERS */
+.counters { display: flex; justify-content: space-around; font-size: 0.82rem; margin-bottom: 12px; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+
+/* FILTERS */
+.filters { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
+.filters button { padding: 7px 12px; font-size: 0.78rem; background: var(--border); color: var(--text-dark); border-radius: 20px; min-width: fit-content; white-space: nowrap; }
+.filters button.active-filter { background: var(--primary); color: white; }
+
+/* HISTORY ITEM */
+.history-item { background: white; padding: 14px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid var(--pending); font-size: 0.88rem; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+.history-item.win { border-left-color: var(--success); }
+.history-item.loss { border-left-color: var(--danger); }
+.history-item.void { border-left-color: var(--void); }
+.h-head { display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.72rem; margin-bottom: 4px; }
+.h-title { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); }
+.h-detail { color: var(--primary); font-weight: 600; margin: 4px 0; display: block; font-size: 0.83rem; }
+.h-foot { display: flex; justify-content: space-between; border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 8px; font-size: 0.82rem; color: var(--text-muted); }
+.h-profit { margin-top: 6px; text-align: right; font-weight: 800; font-size: 0.95rem; }
+.h-actions { display: flex; gap: 6px; margin-top: 10px; }
+.h-actions button { padding: 7px; font-size: 0.78rem; border-radius: 6px; }
+
+/* CHART */
+#bankroll-chart { width: 100%; height: 140px; }
+.chart-empty { text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 40px 0; }
+
+/* DICTIONARY */
+.edu-item { border-left: 4px solid var(--secondary); padding: 14px; background: white; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+.edu-item h4 { margin: 0 0 4px 0; color: var(--primary); font-size: 0.95rem; }
+.edu-item p { margin: 0; font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; }
+
+/* PENDING BADGE */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; }
+.badge-pending { background: #f0f0f0; color: #777; }
+.badge-win { background: #e6faf5; color: var(--success); }
+.badge-loss { background: #fef0f0; color: var(--danger); }
+
+/* AUTH */
+.auth-card { max-width: 340px; margin: 60px auto 0; }
+
+/* DARK TOGGLE */
+.dark-toggle { position: fixed; bottom: 18px; right: 18px; width: 46px; height: 46px; border-radius: 50%; background: var(--primary); color: white; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.25); cursor: pointer; border: none; padding: 0; z-index: 999; transition: background 0.3s; }
+
+/* TEXTAREA (notas) */
+textarea { width: 100%; padding: 11px 12px; margin-bottom: 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.92rem; background: #fafafa; color: var(--text-dark); resize: vertical; font-family: inherit; transition: border-color 0.2s; }
+textarea:focus { outline: none; border-color: var(--primary); background: white; }
+.nota-display { font-size: 0.78rem; color: var(--text-muted); font-style: italic; margin-top: 6px; padding: 6px 10px; background: rgba(0,0,0,0.03); border-radius: 6px; border-left: 3px solid var(--border); }
+
+/* MEJOR / PEOR APUESTA */
+.best-worst-card { display: flex; gap: 10px; margin-bottom: 14px; }
+.bw-item { flex: 1; padding: 12px; border-radius: 10px; background: #f8f9ff; border: 1.5px solid var(--border); }
+.bw-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.bw-match { font-size: 0.8rem; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; }
+.bw-profit { font-size: 1.1rem; font-weight: 800; }
+.bw-meta { font-size: 0.72rem; color: var(--text-muted); }
+
+/* COMBINADA */
+.combi-sel-card { background: #f8f9ff; border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; position: relative; }
+.combi-sel-card .combi-num { position: absolute; top: -10px; left: 14px; background: var(--primary); color: white; font-size: 0.7rem; font-weight: 700; padding: 2px 10px; border-radius: 10px; letter-spacing: 0.5px; }
+.combi-sel-card .remove-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--danger); font-size: 1.1rem; cursor: pointer; width: auto; padding: 0; }
+.combi-summary { background: linear-gradient(135deg, #f0f4ff, #e8eeff); border: 1.5px solid var(--secondary); border-radius: 12px; padding: 14px 18px; margin-bottom: 4px; }
+.combi-summary-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 0.9rem; color: var(--text-muted); border-bottom: 1px solid rgba(0,0,0,0.05); }
+.combi-summary-row:last-child { border-bottom: none; }
+.combi-sel-odds { display: inline-block; background: var(--primary); color: white; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 8px; margin-left: 6px; }
+/* HISTORY COMBI */
+.combi-picks { margin: 6px 0; padding: 8px 10px; background: #f8f9ff; border-radius: 8px; border-left: 3px solid var(--secondary); }
+.combi-pick-row { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 3px 0; border-bottom: 1px dashed #eee; color: var(--text-muted); }
+.combi-pick-row:last-child { border-bottom: none; }
+.combi-pick-row span:first-child { font-weight: 600; color: var(--text-dark); }
+
+/* ANÁLISIS */
+.analisis-sport-row { display: flex; flex-direction: column; margin-bottom: 14px; }
+.analisis-sport-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.analisis-sport-name { font-weight: 700; font-size: 0.9rem; color: var(--text-dark); }
+.analisis-sport-meta { font-size: 0.75rem; color: var(--text-muted); }
+.analisis-bar-track { height: 8px; background: #eef2f5; border-radius: 4px; overflow: hidden; }
+.analisis-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.analisis-sport-stats { display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.75rem; color: var(--text-muted); }
+.analisis-sport-stats span b { color: var(--text-dark); }
+.consejo-card { background: #f8f9ff; border-left: 4px solid var(--primary); padding: 12px 14px; border-radius: 0 10px 10px 0; margin-bottom: 10px; }
+.consejo-card.warning { border-left-color: var(--void); background: #fffbf0; }
+.consejo-card.danger  { border-left-color: var(--danger); background: #fff5f5; }
+.consejo-card.success { border-left-color: var(--success); background: #f0faf6; }
+.consejo-card h4 { font-size: 0.85rem; color: var(--primary); margin-bottom: 4px; }
+.consejo-card.warning h4 { color: var(--void); }
+.consejo-card.danger  h4 { color: var(--danger); }
+.consejo-card.success h4 { color: var(--success); }
+.consejo-card p { font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+.racha-badge { display: inline-flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+.racha-dot { width: 22px; height: 22px; border-radius: 50%; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; }
+</style>
+</head>
+<body>
+<div id="app-container">
+
+  <nav id="main-nav" style="display:none">
+    <button onclick="navTo('view-main')" id="nav-main">🏠 Inicio</button>
+    <button onclick="navTo('view-football')" id="nav-football">⚽ Fútbol</button>
+    <button onclick="navTo('view-nba')" id="nav-nba">🏀 NBA</button>
+    <button onclick="navTo('view-combi')" id="nav-combi">🎰 Combinada</button>
+    <button onclick="navTo('view-stats')" id="nav-stats">📊 Historial</button>
+    <button onclick="navTo('view-analisis')" id="nav-analisis">🔍 Análisis</button>
+    <button onclick="navTo('view-edu')" id="nav-edu">📖 Glosario</button>
+    <button class="logout-btn" onclick="logout()">Salir</button>
+  </nav>
+
+  <!-- DARK MODE TOGGLE -->
+  <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()" title="Modo oscuro">🌙</button>
+
+  <!-- AUTH -->
+  <div id="view-auth" class="view active">
+    <h1 class="app-title">BetManager Pro</h1>
+    <p class="app-subtitle">Gestiona y analiza tus apuestas deportivas</p>
+    <div class="card auth-card">
+      <h3 style="margin-bottom:16px; color:var(--primary)">Ingreso al Sistema</h3>
+      <label>Correo o Usuario</label>
+      <input type="text" id="auth-email" placeholder="usuario@ejemplo.com">
+      <label>Contraseña</label>
+      <input type="password" id="auth-pass" placeholder="••••••••">
+      <button onclick="login()" style="margin-bottom:10px">Iniciar Sesión</button>
+      <button class="btn-secondary" onclick="register()">Crear Cuenta</button>
+    </div>
+  </div>
+
+  <!-- INICIO -->
+  <div id="view-main" class="view">
+    <div class="card bank-card">
+      <small>Tu Bankroll Actual (COP)</small>
+      <h2 id="bank-display">$0</h2>
+      <small id="bank-diff" style="display:none; font-size:0.78rem; font-weight:600; letter-spacing:0.5px;"></small>
+      <div class="bank-setup" id="bank-setup-div">
+        <p class="bank-tip">* Recomendable iniciar mínimo con $50,000 COP.<br>* Este dinero debe ser exclusivo para apostar.</p>
+        <div class="row">
+          <input type="number" id="new-bank-input" placeholder="Ingresa tu Bankroll" style="margin:0">
+          <button onclick="setBank()" style="width:auto; padding:11px 16px; margin:0">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen rápido -->
+    <div class="card stats-header" id="quick-stats" style="display:none">
+      <div class="stat-col"><b>Yield</b><span id="qs-yield">0%</span></div>
+      <div class="stat-col"><b>Acierto</b><span id="qs-wr">0%</span></div>
+      <div class="stat-col"><b>Apuestas</b><span id="qs-count">0</span></div>
+      <div class="stat-col"><b>P&G</b><span id="qs-profit">$0</span></div>
+    </div>
+
+    <!-- Gráfico bankroll -->
+    <div class="card">
+      <div class="section-title">📈 Evolución del Bankroll</div>
+      <canvas id="bankroll-chart"></canvas>
+      <p class="chart-empty" id="chart-empty">Registra apuestas para ver tu evolución</p>
+    </div>
+  </div>
+
+  <!-- FÚTBOL -->
+  <div id="view-football" class="view">
+    <div class="card">
+      <h3 style="margin-bottom:14px; color:var(--primary)">⚽ Nueva Apuesta de Fútbol</h3>
+
+      <label>Liga:</label>
+      <select id="fb-league" onchange="loadTeams('fb')">
+        <option value="">Selecciona Liga...</option>
+        <option value="Premier League">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</option>
+        <option value="La Liga">🇪🇸 La Liga</option>
+        <option value="Serie A">🇮🇹 Serie A</option>
+        <option value="Liga BetPlay">🇨🇴 Liga BetPlay</option>
+        <option value="Champions League">🇪🇺 Champions League</option>
+        <option value="Bundesliga">🇩🇪 Bundesliga</option>
+        <option value="Ligue 1">🇫🇷 Ligue 1</option>
+      </select>
+
+      <div class="row">
+        <div class="col">
+          <label>Local:</label>
+          <select id="fb-local" onchange="updateDynamicMarkets('fb')"><option value="">Elige Liga primero</option></select>
+        </div>
+        <div class="col">
+          <label>Visitante:</label>
+          <select id="fb-away" onchange="updateDynamicMarkets('fb')"><option value="">Elige Liga primero</option></select>
+        </div>
+      </div>
+
+      <hr>
+
+      <label>Tipo de Apuesta:</label>
+      <select id="fb-market" onchange="updateDynamicMarkets('fb')">
+        <option value="">Selecciona mercado...</option>
+        <option value="1X2">1X2 (Ganador)</option>
+        <option value="Doble Oportunidad">Doble Oportunidad</option>
+        <option value="Goles">Total de Goles</option>
+        <option value="Corners">Tiros de Esquina</option>
+        <option value="Tarjetas">Total de Tarjetas</option>
+        <option value="Jugador">Props de Jugador</option>
+        <option value="Handicap">Hándicap</option>
+        <option value="Ambos Marcan">Ambos Equipos Marcan</option>
+      </select>
+
+      <div id="fb-dynamic-container"></div>
+
+      <hr>
+
+      <div class="section-title">💰 Stake y Cuota</div>
+
+      <div class="stake-box">
+        <label>Stake (Confianza 1–10): <span id="fb-stake-val">1</span></label>
+        <input type="range" id="fb-stake" min="1" max="10" value="1" oninput="calculateBetAmount('fb')">
+        <p class="auto-calc">Se invertirá el <b id="fb-stake-pct">2%</b> de tu Bankroll inicial</p>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>Cuota (@)</label>
+          <input type="number" step="0.01" id="fb-odds" placeholder="Ej: 1.80" oninput="calculateBetAmount('fb')">
+        </div>
+        <div class="col">
+          <label>Monto a Apostar</label>
+          <input type="number" id="fb-money" readonly>
+        </div>
+      </div>
+
+      <label>Resultado:</label>
+      <select id="fb-result">
+        <option value="Pendiente">⏳ Pendiente</option>
+        <option value="Ganada">✅ Ganada</option>
+        <option value="Perdida">❌ Perdida</option>
+        <option value="Nula">🔄 Nula (Void)</option>
+      </select>
+
+      <label>Notas (opcional)</label>
+      <textarea id="fb-notes" rows="2" placeholder="Ej: Equipo local en racha, baja el portero titular..."></textarea>
+
+      <div class="row" style="margin-top:4px">
+        <button onclick="saveBet('Fútbol')" class="btn-success">✔ Guardar Apuesta</button>
+        <button onclick="clearForm('fb')" class="btn-secondary" style="width:120px">Limpiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NBA -->
+  <div id="view-nba" class="view">
+    <div class="card">
+      <h3 style="margin-bottom:6px; color:var(--primary)">🏀 Nueva Apuesta NBA</h3>
+      <p style="font-size:0.78rem; color:var(--secondary); margin-bottom:14px">🤖 Próximamente: IA para pronósticos</p>
+
+      <div class="row">
+        <div class="col">
+          <label>Local:</label>
+          <select id="nba-local" onchange="updateDynamicMarkets('nba')"></select>
+        </div>
+        <div class="col">
+          <label>Visitante:</label>
+          <select id="nba-away" onchange="updateDynamicMarkets('nba')"></select>
+        </div>
+      </div>
+
+      <hr>
+
+      <label>Tipo de Apuesta:</label>
+      <select id="nba-market" onchange="updateDynamicMarkets('nba')">
+        <option value="">Selecciona mercado...</option>
+        <option value="Ganador">Ganador del Partido (ML)</option>
+        <option value="Handicap">Hándicap (Spread)</option>
+        <option value="Puntos Totales">Puntos Totales (O/U)</option>
+        <option value="Props Jugador">Props de Jugador</option>
+        <option value="Cuartos">Ganador por Cuartos</option>
+      </select>
+
+      <div id="nba-dynamic-container"></div>
+
+      <hr>
+
+      <div class="section-title">💰 Stake y Cuota</div>
+
+      <div class="stake-box">
+        <label>Stake (Confianza 1–10): <span id="nba-stake-val">1</span></label>
+        <input type="range" id="nba-stake" min="1" max="10" value="1" oninput="calculateBetAmount('nba')">
+        <p class="auto-calc">Se invertirá el <b id="nba-stake-pct">2%</b> de tu Bankroll inicial</p>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>Cuota (@)</label>
+          <input type="number" step="0.01" id="nba-odds" placeholder="Ej: 1.90" oninput="calculateBetAmount('nba')">
+        </div>
+        <div class="col">
+          <label>Monto a Apostar</label>
+          <input type="number" id="nba-money" readonly>
+        </div>
+      </div>
+
+      <label>Resultado:</label>
+      <select id="nba-result">
+        <option value="Pendiente">⏳ Pendiente</option>
+        <option value="Ganada">✅ Ganada</option>
+        <option value="Perdida">❌ Perdida</option>
+        <option value="Nula">🔄 Nula (Void)</option>
+      </select>
+
+      <label>Notas (opcional)</label>
+      <textarea id="nba-notes" rows="2" placeholder="Ej: Back-to-back para el local, baja estrella titular..."></textarea>
+
+      <div class="row" style="margin-top:4px">
+        <button onclick="saveBet('NBA')" class="btn-success">✔ Guardar Apuesta</button>
+        <button onclick="clearForm('nba')" class="btn-secondary" style="width:120px">Limpiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div id="view-stats" class="view">
+    <div class="card stats-header">
+      <div class="stat-col"><b>Yield</b><span id="st-yield">0%</span></div>
+      <div class="stat-col"><b>Acierto</b><span id="st-winrate">0%</span></div>
+      <div class="stat-col"><b>P&G</b><span id="st-profit">$0</span></div>
+    </div>
+    <div class="counters">
+      <span>✅ <b id="st-won">0</b></span>
+      <span>❌ <b id="st-lost">0</b></span>
+      <span>⏳ <b id="st-pending">0</b></span>
+      <span>📝 <b id="st-total">0</b></span>
+    </div>
+    <div class="filters">
+      <button onclick="renderHistory('Todas', this)" class="active-filter">Todas</button>
+      <button onclick="renderHistory('Ganada', this)">✅ Ganadas</button>
+      <button onclick="renderHistory('Perdida', this)">❌ Perdidas</button>
+      <button onclick="renderHistory('Pendiente', this)">⏳ Pendientes</button>
+      <button onclick="renderHistory('Nula', this)">🔄 Nulas</button>
+    </div>
+    <div id="history-list"></div>
+    <button onclick="resetHistory()" class="btn-text" style="color:var(--danger); margin-top:10px">⚠️ Reiniciar todo el historial</button>
+  </div>
+
+  <!-- DICCIONARIO -->
+  <div id="view-edu" class="view">
+    <h2 style="margin-bottom:14px; color:var(--primary)">Glosario de Apuestas 📖</h2>
+    <div id="diccionario-list"></div>
+  </div>
+
+  <!-- ANÁLISIS -->
+  <div id="view-analisis" class="view">
+
+    <!-- Mejor / Peor apuesta -->
+    <div class="card">
+      <div class="section-title">🏆 Mejor y Peor Apuesta</div>
+      <div id="analisis-bestworse">
+        <p style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:16px 0">Sin apuestas resueltas todavía</p>
+      </div>
+    </div>
+
+    <!-- Racha actual -->
+    <div class="card" id="racha-card">
+      <div class="section-title">🔥 Racha Actual</div>
+      <div id="racha-display" style="text-align:center; padding:10px 0">
+        <div id="racha-emoji" style="font-size:2.4rem; margin-bottom:6px">—</div>
+        <div id="racha-texto" style="font-size:1rem; font-weight:700; color:var(--text-dark)">Sin apuestas resueltas</div>
+        <div id="racha-sub" style="font-size:0.8rem; color:var(--text-muted); margin-top:4px"></div>
+      </div>
+    </div>
+
+    <!-- Yield por deporte -->
+    <div class="card">
+      <div class="section-title">📊 Rendimiento por Deporte</div>
+      <div id="analisis-deportes">
+        <p style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:16px 0">Registra apuestas para ver estadísticas</p>
+      </div>
+    </div>
+
+    <!-- Yield por liga (solo fútbol) -->
+    <div class="card" id="card-ligas">
+      <div class="section-title">🏆 Rendimiento por Liga</div>
+      <div id="analisis-ligas">
+        <p style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:16px 0">Sin datos suficientes</p>
+      </div>
+    </div>
+
+    <!-- Consejos -->
+    <div class="card">
+      <div class="section-title">💡 Consejos de Gestión</div>
+      <div id="consejos-list"></div>
+    </div>
+
+  </div>
+
+</div>
+  <div id="view-combi" class="view">
+    <div class="card">
+      <h3 style="margin-bottom:4px; color:var(--primary)">🎰 Apuesta Combinada</h3>
+      <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:16px">Añade todas las selecciones. La cuota total se calcula automáticamente.</p>
+
+      <!-- Selecciones dinámicas -->
+      <div id="combi-selections"></div>
+
+      <button onclick="addCombiSelection()" class="btn-secondary" style="margin-bottom:16px; border: 1.5px dashed var(--secondary); background:none; color:var(--secondary); font-size:0.9rem;">
+        ＋ Añadir selección
+      </button>
+
+      <hr>
+
+      <!-- Resumen cuota total -->
+      <div class="combi-summary" id="combi-summary" style="display:none">
+        <div class="combi-summary-row">
+          <span>Selecciones</span><b id="combi-count">0</b>
+        </div>
+        <div class="combi-summary-row">
+          <span>Cuota Total</span><b id="combi-total-odds" style="color:var(--primary); font-size:1.1rem">1.00</b>
+        </div>
+        <div class="combi-summary-row">
+          <span>Ganancia potencial</span><b id="combi-potential" style="color:var(--success)">$0</b>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:14px">💰 Stake y Cuota</div>
+
+      <div class="stake-box">
+        <label>Stake (Confianza 1–10): <span id="combi-stake-val">1</span></label>
+        <input type="range" id="combi-stake" min="1" max="10" value="1" oninput="updateCombiOdds()">
+        <p class="auto-calc">Se invertirá el <b id="combi-stake-pct">2%</b> de tu Bankroll inicial</p>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>Monto a Apostar</label>
+          <input type="number" id="combi-money" readonly>
+        </div>
+        <div class="col">
+          <label>Resultado</label>
+          <select id="combi-result">
+            <option value="Pendiente">⏳ Pendiente</option>
+            <option value="Ganada">✅ Ganada</option>
+            <option value="Perdida">❌ Perdida</option>
+            <option value="Nula">🔄 Nula (Void)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:4px">
+        <button onclick="saveCombi()" class="btn-success">✔ Guardar Combinada</button>
+        <button onclick="clearCombi()" class="btn-secondary" style="width:120px">Limpiar</button>
+      </div>
+
+      <label style="margin-top:12px">Notas (opcional)</label>
+      <textarea id="combi-notes" rows="2" placeholder="Ej: Todas las selecciones en casa, fin de semana sin bajas..."></textarea>
+
+</div>
+
+<script>
+// ─── BASE DE DATOS ────────────────────────────────────────────────
+const DB = {
+  football: {
+    "Premier League": ["Arsenal","Aston Villa","Bournemouth","Brentford","Brighton","Chelsea","Crystal Palace","Everton","Fulham","Ipswich Town","Leicester City","Liverpool","Man City","Man Utd","Newcastle","Nottm Forest","Southampton","Tottenham","West Ham","Wolves"],
+    "La Liga": ["Alavés","Athletic Club","Atlético Madrid","Barcelona","Celta","Espanyol","Getafe","Girona","Las Palmas","Leganés","Mallorca","Osasuna","Rayo","Betis","Real Madrid","Real Sociedad","Sevilla","Valencia","Valladolid","Villarreal"],
+    "Serie A": ["Atalanta","Bologna","Cagliari","Como","Empoli","Fiorentina","Genoa","Inter","Juventus","Lazio","Lecce","AC Milan","Monza","Napoli","Parma","Roma","Torino","Udinese","Venezia","Verona"],
+    "Liga BetPlay": ["América","Nacional","Millonarios","Junior","Santa Fe","Medellín","Tolima","Cali","Once Caldas","Bucaramanga","Pasto","La Equidad","Peñarol","Alianza Petrolera"],
+    "Champions League": ["Arsenal","Aston Villa","Atlético Madrid","Barcelona","Bayern Munich","Benfica","Bologna","Brest","Celtic","Club Brugge","Dinamo Zagreb","Dortmund","Feyenoord","Girona","Inter","Juventus","Leverkusen","Lille","Man City","Monaco","PSG","PSV","Porto","RB Leipzig","Real Madrid","Salzburg","Shakhtar","Slavia Praha","Sparta Praha","Sporting CP","Sturm Graz","Young Boys"],
+    "Bundesliga": ["Augsburg","Bayern Munich","Bochum","Dortmund","Frankfurt","Freiburg","Holstein Kiel","Hoffenheim","Leverkusen","Mainz","Mönchengladbach","RB Leipzig","St. Pauli","Stuttgart","Union Berlin","Werder Bremen"],
+    "Ligue 1": ["Angers","Auxerre","Brest","Lens","Lille","Lyon","Marseille","Monaco","Montpellier","Nantes","Nice","PSG","Reims","Rennes","Saint-Étienne","Strasbourg","Toulouse"]
+  },
+  nba: ["Atlanta Hawks","Boston Celtics","Brooklyn Nets","Charlotte Hornets","Chicago Bulls","Cleveland Cavaliers","Dallas Mavericks","Denver Nuggets","Detroit Pistons","Golden State Warriors","Houston Rockets","Indiana Pacers","Los Angeles Clippers","Los Angeles Lakers","Memphis Grizzlies","Miami Heat","Milwaukee Bucks","Minnesota Timberwolves","New Orleans Pelicans","New York Knicks","Oklahoma City Thunder","Orlando Magic","Philadelphia 76ers","Phoenix Suns","Portland Trail Blazers","Sacramento Kings","San Antonio Spurs","Toronto Raptors","Utah Jazz","Washington Wizards"],
+  dictionary: [
+    { t: "Bankroll", d: "Capital total destinado exclusivamente a apostar. No debe ser dinero de uso cotidiano ni mezclarse con tus finanzas personales." },
+    { t: "Stake", d: "Nivel de confianza de una apuesta del 1 al 10. En BetManager, 1 stake = 2% de tu Bankroll inicial." },
+    { t: "Flat Staking", d: "Sistema donde siempre apuestas el mismo porcentaje del bankroll inicial, sin importar tus ganancias o pérdidas recientes. Elimina la distorsión emocional." },
+    { t: "P&G (Pérdidas y Ganancias)", d: "Beneficio neto total de tus apuestas. Se calcula sumando las ganancias y restando las pérdidas en COP. Es tu resultado final en términos monetarios." },
+    { t: "Yield", d: "Rentabilidad pura. Beneficio neto dividido entre el total invertido, multiplicado por 100. Un yield sostenido del 5–10% es excelente a largo plazo." },
+    { t: "ROI (Return on Investment)", d: "Similar al yield. Mide el retorno sobre lo invertido. Se usa indistintamente con yield en contexto de apuestas deportivas." },
+    { t: "Value Bet", d: "Apuesta de valor. Cuando la probabilidad real de que ocurra un evento es mayor a la que refleja la cuota. Es la base de las apuestas profesionales." },
+    { t: "Over / Under (O/U)", d: "Línea de totales. Apostás si habrá más o menos de X goles, puntos o córners en un partido. Ej: Más de 2.5 goles." },
+    { t: "CLV (Closing Line Value)", d: "Batir a la línea de cierre. Si apostás a 2.00 y el partido empieza a 1.80, tienes CLV positivo: señal de que apostaste con valor real." },
+    { t: "Props", d: "Apuestas sobre estadísticas individuales de jugadores (goles, rebotes, asistencias, disparos, etc.)." },
+    { t: "Hándicap", d: "Ventaja o desventaja ficticia aplicada a un equipo para equilibrar el mercado. Ej: Real Madrid –1.5 goles significa que necesita ganar por 2 o más." },
+    { t: "Doble Oportunidad", d: "Cubre dos de los tres resultados posibles (1X, X2 o 12). Cuotas más bajas pero mayor probabilidad de acierto." },
+    { t: "Cuota Implícita", d: "La probabilidad que refleja la cuota. Para calcularla: 1 ÷ cuota × 100. Ej: cuota 2.00 → 50% de probabilidad implícita." },
+    { t: "Void / Nula", d: "Apuesta anulada. El dinero se devuelve íntegramente. Ocurre por suspensión del partido, errores del operador u otras causas estipuladas." },
+    { t: "Kelly Criterion", d: "Fórmula matemática para determinar el % óptimo del bankroll a apostar: (p × b – q) / b, donde p es probabilidad estimada y b es la cuota –1." },
+    { t: "Combinada (Parlay)", d: "Apuesta que une varias selecciones. La cuota total es el producto de todas las cuotas individuales. Basta con fallar una para perderlo todo." },
+    { t: "Moneyline (ML)", d: "Apuesta directa al ganador del partido sin hándicap. Muy común en NBA y béisbol. Ej: Lakers ML significa apostar a que ganan." },
+    { t: "Spread", d: "Hándicap de puntos usado principalmente en NBA y NFL. Ej: Lakers –5.5 significa que deben ganar por 6 o más puntos." },
+    { t: "Sharp / Sharps", d: "Apostadores profesionales con capital alto y análisis profundo. Cuando los sharps apuestan masivamente, las casas mueven la línea." },
+    { t: "Tilt", d: "Estado emocional en el que se toman decisiones irracionales tras una racha perdedora. El mayor enemigo del apostador disciplinado." },
+    { t: "Juice / Margen", d: "Comisión que cobra la casa de apuestas. En cuota 1.90/1.90, el margen es ~5.26%. Siempre aposta en casas con el menor margen posible." },
+    { t: "Cuota Decimal", d: "Formato europeo más usado. La ganancia total = cuota × stake. Ej: apuestas $10.000 a cuota 2.50 y ganas $25.000 (incluyendo el stake)." },
+    { t: "Cuota Americana", d: "Formato usado en EE.UU. Las positivas (+150) indican cuánto ganas por $100 apostados. Las negativas (–200) indican cuánto debes apostar para ganar $100." },
+    { t: "Línea de Cierre", d: "La cuota definitiva justo antes de que empiece el partido, cuando ya se ha incorporado toda la información disponible. Es la referencia más eficiente del mercado." },
+    { t: "Cashout (Retiro anticipado)", d: "Opción de algunas casas para cobrar parte de las ganancias antes de que termine el evento. Útil para asegurar ganancias, pero erosiona el valor esperado a largo plazo." }
+  ]
+};
+
+// ─── ESTADO ───────────────────────────────────────────────────────
+let userEmail = null;
+let appData = { bank: 0, initialBank: 0, history: [] };
+
+// ─── INIT ─────────────────────────────────────────────────────────
+window.onload = () => {
+  // Restaurar modo oscuro
+  if (localStorage.getItem('bmDark')) {
+    document.body.classList.add('dark');
+    document.getElementById('dark-toggle').innerText = '☀️';
+  }
+
+  // Diccionario
+  const dic = document.getElementById('diccionario-list');
+  DB.dictionary.forEach(d => {
+    dic.innerHTML += `<div class="edu-item"><h4>${d.t}</h4><p>${d.d}</p></div>`;
+  });
+
+  // NBA dropdowns
+  const nbaL = document.getElementById('nba-local');
+  const nbaA = document.getElementById('nba-away');
+  DB.nba.sort().forEach(t => {
+    nbaL.innerHTML += `<option value="${t}">${t}</option>`;
+    nbaA.innerHTML += `<option value="${t}">${t}</option>`;
+  });
+
+  const active = localStorage.getItem('activeUser');
+  if (active) {
+    userEmail = active;
+    loadUserData();
+    document.getElementById('main-nav').style.display = 'flex';
+    navTo('view-main');
+  }
+};
+
+// ─── NAV ──────────────────────────────────────────────────────────
+function navTo(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button[id^="nav-"]').forEach(b => b.classList.remove('active-nav'));
+  document.getElementById(id).classList.add('active');
+  const btnMap = { 'view-main': 'nav-main', 'view-football': 'nav-football', 'view-nba': 'nav-nba', 'view-combi': 'nav-combi', 'view-stats': 'nav-stats', 'view-analisis': 'nav-analisis', 'view-edu': 'nav-edu' };
+  if (btnMap[id]) document.getElementById(btnMap[id]).classList.add('active-nav');
+  if (id === 'view-stats') renderHistory('Todas', null);
+  if (id === 'view-main') { updateQuickStats(); drawChart(); }
+  if (id === 'view-combi' && document.getElementById('combi-selections').children.length === 0) addCombiSelection();
+  if (id === 'view-analisis') renderAnalisis();
+}
+
+// ─── AUTH ─────────────────────────────────────────────────────────
+function register() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  if (!email || !pass) return alert("Ingresa usuario y contraseña.");
+  let users = JSON.parse(localStorage.getItem('bmUsers')) || {};
+  if (users[email]) return alert("El usuario ya existe.");
+  users[email] = { pass, bank: 0, history: [] };
+  localStorage.setItem('bmUsers', JSON.stringify(users));
+  alert("✅ Cuenta creada. Ahora inicia sesión.");
+}
+
+function login() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  let users = JSON.parse(localStorage.getItem('bmUsers')) || {};
+  if (users[email] && users[email].pass === pass) {
+    userEmail = email;
+    localStorage.setItem('activeUser', email);
+    loadUserData();
+    document.getElementById('main-nav').style.display = 'flex';
+    navTo('view-main');
+  } else {
+    alert("❌ Usuario o contraseña incorrectos.");
+  }
+}
+
+function logout() {
+  localStorage.removeItem('activeUser');
+  userEmail = null;
+  document.getElementById('main-nav').style.display = 'none';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-auth').classList.add('active');
+}
+
+// ─── DATOS ────────────────────────────────────────────────────────
+function loadUserData() {
+  const users = JSON.parse(localStorage.getItem('bmUsers'));
+  appData = users[userEmail];
+  updateBankUI();
+}
+
+function saveUserData() {
+  const users = JSON.parse(localStorage.getItem('bmUsers'));
+  users[userEmail] = appData;
+  localStorage.setItem('bmUsers', JSON.stringify(users));
+  updateBankUI();
+}
+
+// ─── BANKROLL ─────────────────────────────────────────────────────
+function setBank() {
+  const val = parseFloat(document.getElementById('new-bank-input').value);
+  if (val > 0) {
+    appData.bank = val;
+    appData.initialBank = val; // guardamos el bank base para flat staking
+    saveUserData();
+    document.getElementById('new-bank-input').value = '';
+    calculateBetAmount('fb');
+    calculateBetAmount('nba');
+  }
+}
+
+function updateBankUI() {
+  document.getElementById('bank-display').innerText = `$${appData.bank.toLocaleString('es-CO')}`;
+  // Mostrar variación vs bank inicial
+  const diff = appData.bank - (appData.initialBank || appData.bank);
+  const diffEl = document.getElementById('bank-diff');
+  if (diffEl && appData.initialBank && appData.bank !== appData.initialBank) {
+    diffEl.innerText = `${diff >= 0 ? '▲ +' : '▼ '}$${Math.abs(diff).toLocaleString('es-CO')} vs inicio`;
+    diffEl.style.color = diff >= 0 ? '#a8edda' : '#ffb3b3';
+    diffEl.style.display = 'block';
+  } else if (diffEl) {
+    diffEl.style.display = 'none';
+  }
+  const hasBank = appData.bank > 0 || appData.initialBank > 0;
+  document.getElementById('bank-setup-div').style.display = hasBank ? 'none' : 'block';
+  calculateBetAmount('fb');
+  calculateBetAmount('nba');
+}
+
+// ─── STAKE (Flat staking: 2% por unidad sobre bank inicial) ───────
+function calculateBetAmount(sport) {
+  const stake = document.getElementById(`${sport}-stake`).value;
+  const pct = stake * 2; // 1 unidad = 2%
+  document.getElementById(`${sport}-stake-val`).innerText = stake;
+  document.getElementById(`${sport}-stake-pct`).innerText = `${pct}%`;
+  const base = appData.initialBank || appData.bank; // siempre sobre el bank inicial
+  const amount = Math.round(base * (pct / 100));
+  document.getElementById(`${sport}-money`).value = amount || '';
+}
+
+// ─── EQUIPOS ─────────────────────────────────────────────────────
+function loadTeams(sport) {
+  if (sport === 'fb') {
+    const league = document.getElementById('fb-league').value;
+    const selL = document.getElementById('fb-local');
+    const selA = document.getElementById('fb-away');
+    selL.innerHTML = '<option value="">Elige local</option>';
+    selA.innerHTML = '<option value="">Elige visitante</option>';
+    if (DB.football[league]) {
+      DB.football[league].forEach(t => {
+        selL.innerHTML += `<option value="${t}">${t}</option>`;
+        selA.innerHTML += `<option value="${t}">${t}</option>`;
+      });
+    }
+    document.getElementById('fb-dynamic-container').innerHTML = '';
+  }
+}
+
+// ─── MERCADOS DINÁMICOS ───────────────────────────────────────────
+function updateDynamicMarkets(sport) {
+  const local = document.getElementById(`${sport}-local`).value || "Local";
+  const away  = document.getElementById(`${sport}-away`).value || "Visitante";
+  const market = document.getElementById(`${sport}-market`).value;
+  const container = document.getElementById(`${sport}-dynamic-container`);
+  container.innerHTML = '';
+  if (!market) return;
+
+  if (sport === 'fb') {
+    switch (market) {
+      case '1X2':
+        container.innerHTML = `
+          <label>Selección:</label>
+          <select id="dyn-sel1">
+            <option value="Gana ${local}">Gana ${local} (1)</option>
+            <option value="Empate">Empate (X)</option>
+            <option value="Gana ${away}">Gana ${away} (2)</option>
+          </select>`;
+        break;
+
+      case 'Doble Oportunidad':
+        container.innerHTML = `
+          <label>Selección:</label>
+          <select id="dyn-sel1">
+            <option value="${local} o Empate (1X)">${local} o Empate (1X)</option>
+            <option value="${away} o Empate (X2)">${away} o Empate (X2)</option>
+            <option value="${local} o ${away} (12)">${local} o ${away} (12)</option>
+          </select>`;
+        break;
+
+      case 'Ambos Marcan':
+        container.innerHTML = `
+          <label>Ambos equipos marcan:</label>
+          <select id="dyn-sel1">
+            <option value="Ambos Marcan – Sí">Sí</option>
+            <option value="Ambos Marcan – No">No</option>
+          </select>`;
+        break;
+
+      case 'Goles':
+      case 'Corners': {
+        const lines = market === 'Goles' ? ['0.5','1.5','2.5','3.5','4.5'] : ['6.5','7.5','8.5','9.5','10.5','11.5'];
+        const opts = lines.map(l => `<option value="${l}">${l}</option>`).join('');
+        container.innerHTML = `
+          <label>Equipo / Partido:</label>
+          <select id="dyn-sel1">
+            <option value="Total del Partido">Total del Partido</option>
+            <option value="${local}">${local}</option>
+            <option value="${away}">${away}</option>
+          </select>
+          <div class="row" style="margin-top:10px">
+            <div class="col"><label>Dirección:</label><select id="dyn-sel2"><option value="Más de (+)">Más de (+)</option><option value="Menos de (-)">Menos de (-)</option></select></div>
+            <div class="col"><label>Línea:</label><select id="dyn-sel3">${opts}</select></div>
+          </div>`;
+        break;
+      }
+
+      case 'Tarjetas': {
+        const tLines = ['1.5','2.5','3.5','4.5','5.5','6.5'];
+        const tOpts = tLines.map(l => `<option value="${l}">${l}</option>`).join('');
+        container.innerHTML = `
+          <label>Equipo / Partido:</label>
+          <select id="dyn-sel1">
+            <option value="Total del Partido">Total del Partido</option>
+            <option value="${local}">${local}</option>
+            <option value="${away}">${away}</option>
+          </select>
+          <div class="row" style="margin-top:10px">
+            <div class="col"><label>Tipo:</label>
+              <select id="dyn-sel2">
+                <option value="Tarjetas Totales">Tarjetas Totales</option>
+                <option value="Tarjetas Amarillas">Solo Amarillas</option>
+                <option value="Tarjetas Rojas">Solo Rojas</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>Dirección + Línea:</label>
+              <div class="row">
+                <select id="dyn-sel3"><option value="Más de">Más de</option><option value="Menos de">Menos de</option></select>
+                <select id="dyn-sel4">${tOpts}</select>
+              </div>
+            </div>
+          </div>`;
+        break;
+      }
+
+      case 'Jugador':
+        container.innerHTML = `
+          <label>Jugador:</label>
+          <input type="text" id="dyn-sel1" placeholder="Nombre del jugador">
+          <label>Estadística:</label>
+          <select id="dyn-sel2">
+            <option>Disparos a puerta</option>
+            <option>Disparos totales</option>
+            <option>Asistencias</option>
+            <option>Goleador (Anota)</option>
+            <option>Gol o Asistencia</option>
+            <option>Pases clave</option>
+          </select>
+          <div class="row" style="margin-top:10px">
+            <div class="col"><select id="dyn-sel3"><option value="Más de (+)">Más de (+)</option><option value="Menos de (-)">Menos de (-)</option></select></div>
+            <div class="col"><input type="number" step="0.5" id="dyn-sel4" placeholder="Línea (Ej: 1.5)"></div>
+          </div>`;
+        break;
+
+      case 'Handicap':
+        container.innerHTML = `
+          <label>Equipo con ventaja:</label>
+          <select id="dyn-sel1">
+            <option value="${local}">${local}</option>
+            <option value="${away}">${away}</option>
+          </select>
+          <label>Hándicap:</label>
+          <input type="text" id="dyn-sel2" placeholder="Ej: –1.5 o +0.5">`;
+        break;
+
+      default:
+        container.innerHTML = `<input type="text" id="dyn-sel1" placeholder="Describe la apuesta...">`;
+    }
+
+  } else if (sport === 'nba') {
+    switch (market) {
+      case 'Props Jugador':
+        container.innerHTML = `
+          <label>Jugador:</label>
+          <input type="text" id="nba-dyn1" placeholder="Nombre del jugador">
+          <label>Estadística:</label>
+          <select id="nba-dyn2">
+            <option>Puntos</option>
+            <option>Rebotes</option>
+            <option>Asistencias</option>
+            <option>Puntos + Reb + Ast (PRA)</option>
+            <option>Robos</option>
+            <option>Bloqueos</option>
+            <option>Triples anotados</option>
+          </select>
+          <div class="row" style="margin-top:10px">
+            <div class="col"><select id="nba-dyn3"><option value="Más de (+)">Más de (+)</option><option value="Menos de (-)">Menos de (-)</option></select></div>
+            <div class="col"><input type="number" step="0.5" id="nba-dyn4" placeholder="Línea (Ej: 25.5)"></div>
+          </div>`;
+        break;
+
+      case 'Cuartos':
+        container.innerHTML = `
+          <label>Cuarto:</label>
+          <select id="nba-dyn1">
+            <option>1er Cuarto</option><option>2do Cuarto</option><option>3er Cuarto</option><option>4to Cuarto</option>
+          </select>
+          <label>Ganador:</label>
+          <select id="nba-dyn2">
+            <option value="${local}">${local}</option>
+            <option value="${away}">${away}</option>
+          </select>`;
+        break;
+
+      default:
+        container.innerHTML = `
+          <label>Selección:</label>
+          <select id="nba-dyn1">
+            <option value="${local}">${local}</option>
+            <option value="${away}">${away}</option>
+          </select>
+          <label>Línea (si aplica):</label>
+          <input type="text" id="nba-dyn2" placeholder="Ej: –5.5 o 220.5">`;
+    }
+  }
+}
+
+// ─── GUARDAR APUESTA ─────────────────────────────────────────────
+function saveBet(sportName) {
+  const p = sportName === 'Fútbol' ? 'fb' : 'nba';
+  const local  = document.getElementById(`${p}-local`).value;
+  const away   = document.getElementById(`${p}-away`).value;
+  const market = document.getElementById(`${p}-market`).value;
+  const stake  = document.getElementById(`${p}-stake`).value;
+  const odds   = parseFloat(document.getElementById(`${p}-odds`).value);
+  const money  = parseFloat(document.getElementById(`${p}-money`).value);
+  const result = document.getElementById(`${p}-result`).value;
+  const notes  = document.getElementById(`${p}-notes`).value.trim();
+
+  if (!local || !away || !market || isNaN(odds) || !money) return alert("⚠️ Completa todos los campos.");
+
+  // Construir descripción del mercado
+  let details = buildDetails(p, market);
+
+  let profit = 0;
+  if (result === 'Ganada') {
+    profit = parseFloat(((money * odds) - money).toFixed(0));
+    appData.bank += profit;
+  } else if (result === 'Perdida') {
+    profit = -money;
+    appData.bank -= money;
+  }
+  // Pendiente y Nula no afectan el bank al registrar
+
+  appData.history.push({
+    id: Date.now(),
+    sport: sportName,
+    match: `${local} vs ${away}`,
+    details,
+    notes,
+    stake,
+    odds,
+    money,
+    result,
+    profit,
+    date: new Date().toLocaleDateString('es-CO')
+  });
+
+  saveUserData();
+  clearForm(p);
+  updateQuickStats();
+  drawChart();
+  alert(`✅ Apuesta registrada!\nBankroll: $${appData.bank.toLocaleString('es-CO')}`);
+}
+
+function buildDetails(p, market) {
+  try {
+    if (p === 'fb') {
+      if (market === '1X2') return document.getElementById('dyn-sel1').value;
+      if (market === 'Doble Oportunidad') return document.getElementById('dyn-sel1').value;
+      if (market === 'Ambos Marcan') return document.getElementById('dyn-sel1').value;
+      if (market === 'Goles' || market === 'Corners') return `${market} | ${document.getElementById('dyn-sel1').value} | ${document.getElementById('dyn-sel2').value} ${document.getElementById('dyn-sel3').value}`;
+      if (market === 'Tarjetas') return `${document.getElementById('dyn-sel2').value} | ${document.getElementById('dyn-sel1').value} | ${document.getElementById('dyn-sel3').value} ${document.getElementById('dyn-sel4').value}`;
+      if (market === 'Jugador') return `${document.getElementById('dyn-sel1').value} | ${document.getElementById('dyn-sel2').value} ${document.getElementById('dyn-sel3').value} ${document.getElementById('dyn-sel4').value}`;
+      if (market === 'Handicap') return `Hándicap ${document.getElementById('dyn-sel1').value} ${document.getElementById('dyn-sel2').value}`;
+      return document.getElementById('dyn-sel1')?.value || market;
+    } else {
+      if (market === 'Props Jugador') return `${document.getElementById('nba-dyn1').value} | ${document.getElementById('nba-dyn2').value} ${document.getElementById('nba-dyn3').value} ${document.getElementById('nba-dyn4').value}`;
+      if (market === 'Cuartos') return `${document.getElementById('nba-dyn1').value} | Ganador: ${document.getElementById('nba-dyn2').value}`;
+      return `${market}: ${document.getElementById('nba-dyn1').value} (${document.getElementById('nba-dyn2')?.value || ''})`;
+    }
+  } catch (e) { return market; }
+}
+
+function clearForm(p) {
+  document.getElementById(`${p}-odds`).value = '';
+  document.getElementById(`${p}-result`).value = 'Pendiente';
+  document.getElementById(`${p}-notes`).value = '';
+  document.getElementById(`${p}-dynamic-container`).innerHTML = '';
+  if (p === 'fb') {
+    document.getElementById('fb-market').value = '';
+  } else {
+    document.getElementById('nba-market').value = '';
+  }
+}
+
+// ─── HISTORIAL ────────────────────────────────────────────────────
+function renderHistory(filter, btn) {
+  // Actualizar botón activo
+  if (btn) {
+    document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active-filter'));
+    btn.classList.add('active-filter');
+  }
+
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+
+  let w = 0, l = 0, pend = 0, totalStake = 0, totalProfit = 0;
+
+  // Cálculos globales
+  appData.history.forEach(h => {
+    if (h.result === 'Ganada') { w++; totalStake += h.money; totalProfit += h.profit; }
+    else if (h.result === 'Perdida') { l++; totalStake += h.money; totalProfit += h.profit; }
+    else if (h.result === 'Pendiente') pend++;
+  });
+
+  // Renderizar items filtrados
+  const filtered = filter === 'Todas' ? [...appData.history] : appData.history.filter(h => h.result === filter);
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:30px 0">No hay apuestas en esta categoría</p>`;
+  }
+
+  filtered.slice().reverse().forEach(h => {
+    const statusClass = h.result === 'Ganada' ? 'win' : (h.result === 'Perdida' ? 'loss' : (h.result === 'Nula' ? 'void' : ''));
+    const profitColor = h.profit > 0 ? 'var(--success)' : (h.profit < 0 ? 'var(--danger)' : 'gray');
+    const isPending = h.result === 'Pendiente';
+    const isCombi = h.type === 'Combinada';
+
+    // Bloque de selecciones desglosadas (solo combinadas)
+    const combiBlock = isCombi && h.selections ? `
+      <div class="combi-picks">
+        ${h.selections.map((s, i) => `
+          <div class="combi-pick-row">
+            <span>${i + 1}. ${s.match} — ${s.pick}</span>
+            <span class="combi-sel-odds">@${parseFloat(s.odds).toFixed(2)}</span>
+          </div>`).join('')}
+      </div>` : '';
+
+    list.innerHTML += `
+      <div class="history-item ${statusClass}" id="bet-${h.id}">
+        <div class="h-head">
+          <span>${h.date} · ${h.sport}</span>
+          <b>Stake ${h.stake}</b>
+        </div>
+        <div class="h-title">${h.match}</div>
+        ${combiBlock}
+        <span class="h-detail">▶ ${h.details}</span>
+        ${h.notes ? `<div class="nota-display">📝 ${h.notes}</div>` : ''}
+        <div class="h-foot">
+          <span>Inversión: $${h.money.toLocaleString('es-CO')}</span>
+          <span>Cuota total: @${parseFloat(h.odds).toFixed(2)}</span>
+        </div>
+        ${!isPending ? `<div class="h-profit" style="color:${profitColor}">${h.result}: ${h.profit >= 0 ? '+' : ''}$${h.profit.toLocaleString('es-CO')}</div>` : ''}
+        <div class="h-actions">
+          ${isPending ? `
+            <button class="btn-success" onclick="resolvebet(${h.id}, 'Ganada')" style="font-size:0.75rem;padding:7px">✅ Ganada</button>
+            <button class="btn-danger" onclick="resolvebet(${h.id}, 'Perdida')" style="font-size:0.75rem;padding:7px">❌ Perdida</button>
+            <button onclick="resolvebet(${h.id}, 'Nula')" style="background:var(--void);font-size:0.75rem;padding:7px">🔄 Nula</button>
+          ` : ''}
+          <button onclick="deleteBet(${h.id})" class="btn-secondary" style="font-size:0.75rem;padding:7px;max-width:80px">🗑 Borrar</button>
+        </div>
+      </div>`;
+  });
+
+  // Estadísticas
+  const resolved = w + l;
+  const yieldP = totalStake > 0 ? ((totalProfit / totalStake) * 100).toFixed(2) : 0;
+  const wr = resolved > 0 ? ((w / resolved) * 100).toFixed(1) : 0;
+
+  document.getElementById('st-won').innerText = w;
+  document.getElementById('st-lost').innerText = l;
+  document.getElementById('st-pending').innerText = pend;
+  document.getElementById('st-total').innerText = appData.history.length;
+  document.getElementById('st-yield').innerText = yieldP + '%';
+  document.getElementById('st-winrate').innerText = wr + '%';
+  document.getElementById('st-profit').innerText = `$${totalProfit.toLocaleString('es-CO')}`;
+  document.getElementById('st-yield').style.color = parseFloat(yieldP) >= 0 ? 'var(--success)' : 'var(--danger)';
+  document.getElementById('st-profit').style.color = totalProfit >= 0 ? 'var(--success)' : 'var(--danger)';
+}
+
+function resolvebet(id, newResult) {
+  const idx = appData.history.findIndex(h => h.id === id);
+  if (idx === -1) return;
+  const h = appData.history[idx];
+  const money = h.money;
+  const odds = h.odds;
+
+  let newProfit = 0;
+  if (newResult === 'Ganada') {
+    newProfit = parseFloat(((money * odds) - money).toFixed(0));
+    appData.bank += newProfit;
+  } else if (newResult === 'Perdida') {
+    newProfit = -money;
+    appData.bank -= money;
+  }
+  // Nula: no afecta bank
+
+  appData.history[idx].result = newResult;
+  appData.history[idx].profit = newProfit;
+  saveUserData();
+  renderHistory('Todas', null);
+  updateQuickStats();
+  drawChart();
+}
+
+function deleteBet(id) {
+  if (!confirm("¿Eliminar esta apuesta? El bankroll no se ajustará automáticamente.")) return;
+  appData.history = appData.history.filter(h => h.id !== id);
+  saveUserData();
+  renderHistory('Todas', null);
+  updateQuickStats();
+  drawChart();
+}
+
+function resetHistory() {
+  if (confirm("⚠️ ¿Eliminar historial y reiniciar Bankroll a 0?")) {
+    appData.history = [];
+    appData.bank = 0;
+    saveUserData();
+    renderHistory('Todas', null);
+    updateQuickStats();
+    drawChart();
+  }
+}
+
+// ─── QUICK STATS INICIO ───────────────────────────────────────────
+function updateQuickStats() {
+  const qs = document.getElementById('quick-stats');
+  if (appData.history.length === 0) { qs.style.display = 'none'; return; }
+  qs.style.display = 'flex';
+
+  let w = 0, totalStake = 0, totalProfit = 0;
+  appData.history.forEach(h => {
+    if (h.result === 'Ganada') { w++; totalStake += h.money; totalProfit += h.profit; }
+    else if (h.result === 'Perdida') { totalStake += h.money; totalProfit += h.profit; }
+  });
+  const resolved = appData.history.filter(h => ['Ganada','Perdida'].includes(h.result)).length;
+  const yieldP = totalStake > 0 ? ((totalProfit / totalStake) * 100).toFixed(1) : 0;
+  const wr = resolved > 0 ? ((w / resolved) * 100).toFixed(0) : 0;
+
+  document.getElementById('qs-yield').innerText = yieldP + '%';
+  document.getElementById('qs-wr').innerText = wr + '%';
+  document.getElementById('qs-count').innerText = appData.history.length;
+  document.getElementById('qs-profit').innerText = `$${totalProfit.toLocaleString('es-CO')}`;
+  document.getElementById('qs-yield').style.color = parseFloat(yieldP) >= 0 ? 'var(--success)' : 'var(--danger)';
+  document.getElementById('qs-profit').style.color = totalProfit >= 0 ? 'var(--success)' : 'var(--danger)';
+}
+
+// ─── GRÁFICO BANKROLL ─────────────────────────────────────────────
+function drawChart() {
+  const canvas = document.getElementById('bankroll-chart');
+  const empty  = document.getElementById('chart-empty');
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 460;
+  const H = 140;
+  canvas.width = W;
+  canvas.height = H;
+  ctx.clearRect(0, 0, W, H);
+
+  // Construir puntos de evolución (solo apuestas resueltas)
+  const resolved = appData.history.filter(h => ['Ganada','Perdida'].includes(h.result));
+
+  if (resolved.length < 2) {
+    empty.style.display = 'block';
+    canvas.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  canvas.style.display = 'block';
+
+  let cum = 0;
+  const points = resolved.map(h => { cum += h.profit; return cum; });
+  const allVals = [0, ...points];
+  const minV = Math.min(...allVals);
+  const maxV = Math.max(...allVals);
+  const range = maxV - minV || 1;
+
+  const pad = { top: 14, bottom: 14, left: 10, right: 10 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+
+  const toX = i => pad.left + (i / (points.length - 1 || 1)) * chartW;
+  const toY = v => pad.top + chartH - ((v - minV) / range) * chartH;
+
+  // Línea de cero
+  const zeroY = toY(0);
+  ctx.beginPath();
+  ctx.setLineDash([4,4]);
+  ctx.strokeStyle = '#ddd';
+  ctx.lineWidth = 1;
+  ctx.moveTo(pad.left, zeroY);
+  ctx.lineTo(W - pad.right, zeroY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Área bajo la curva
+  const lastX = toX(points.length - 1);
+  const isPositive = points[points.length - 1] >= 0;
+  const lineColor = isPositive ? '#00b894' : '#d63031';
+
+  ctx.beginPath();
+  ctx.moveTo(toX(0), toY(points[0]));
+  points.forEach((v, i) => { if (i > 0) ctx.lineTo(toX(i), toY(v)); });
+  ctx.lineTo(lastX, H - pad.bottom);
+  ctx.lineTo(toX(0), H - pad.bottom);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, isPositive ? 'rgba(0,184,148,0.25)' : 'rgba(214,48,49,0.25)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Línea principal
+  ctx.beginPath();
+  ctx.moveTo(toX(0), toY(points[0]));
+  points.forEach((v, i) => { if (i > 0) ctx.lineTo(toX(i), toY(v)); });
+  ctx.strokeStyle = lineColor;
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Punto final
+  const last = points[points.length - 1];
+  ctx.beginPath();
+  ctx.arc(lastX, toY(last), 5, 0, Math.PI * 2);
+  ctx.fillStyle = lineColor;
+  ctx.fill();
+
+  // Etiqueta valor final
+  ctx.fillStyle = lineColor;
+  ctx.font = 'bold 11px Segoe UI';
+  ctx.textAlign = lastX > W / 2 ? 'right' : 'left';
+  ctx.fillText(`${last >= 0 ? '+' : ''}$${last.toLocaleString('es-CO')}`, lastX, toY(last) - 9);
+}
+
+// ─── MODO OSCURO ──────────────────────────────────────────────────
+function toggleDark() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('dark-toggle').innerText = isDark ? '☀️' : '🌙';
+  localStorage.setItem('bmDark', isDark ? '1' : '');
+}
+
+// ─── ANÁLISIS ─────────────────────────────────────────────────────
+const CONSEJOS_FIJOS = [
+  { tipo: 'default', titulo: '📐 Flat Staking', texto: 'Tu stake siempre se calcula sobre el bankroll inicial, no el actual. Esto evita que una mala racha reduzca tu exposición de forma descontrolada y que una buena racha te haga apostar de más.' },
+  { tipo: 'default', titulo: '🎯 El Yield es tu norte', texto: 'No importa cuántas apuestas ganas, sino cuánto ganas por cada peso invertido. Un yield positivo sostenido del 5–8% es excelente. Por encima del 10%, excelente.' },
+  { tipo: 'warning', titulo: '⚠️ Cuidado con el Tilt', texto: 'Si pierdes 3 apuestas seguidas, para. Revisa tu metodología antes de seguir. Las peores decisiones se toman intentando recuperar pérdidas rápido.' },
+  { tipo: 'default', titulo: '📅 Apuesta en lo que conoces', texto: 'Especialízate en 1 o 2 ligas como máximo. El conocimiento profundo de un mercado vale más que apostar en todo.' },
+  { tipo: 'success', titulo: '✅ Registra tu razonamiento', texto: 'Antes de guardar cada apuesta, anota (aunque sea mentalmente) por qué la haces. Revisar tu lógica después de que el partido termina acelera tu aprendizaje.' },
+  { tipo: 'default', titulo: '📊 Mínimo 100 apuestas para concluir', texto: 'Con menos de 100 apuestas resueltas, los resultados son estadísticamente poco fiables. No te emociones muy rápido ni te desesperes: el largo plazo es la única medida real.' },
+  { tipo: 'warning', titulo: '🎰 Cuidado con las combinadas', texto: 'Las combinadas multiplican la cuota pero también el riesgo. Una selección fallida lo pierde todo. Úsalas con moderación y nunca para "recuperar" dinero perdido.' },
+];
+
+function renderAnalisis() {
+  const resolved = appData.history.filter(h => ['Ganada','Perdida'].includes(h.result));
+
+  // ── MEJOR / PEOR APUESTA ──────────────────────────────────────
+  const bwEl = document.getElementById('analisis-bestworse');
+  if (resolved.length === 0) {
+    bwEl.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:16px 0">Sin apuestas resueltas todavía</p>';
+  } else {
+    const best  = resolved.reduce((a, b) => b.profit > a.profit ? b : a);
+    const worst = resolved.reduce((a, b) => b.profit < a.profit ? b : a);
+    const bwItem = (h, tipo) => {
+      const isGood = tipo === 'best';
+      const color  = isGood ? 'var(--success)' : 'var(--danger)';
+      const label  = isGood ? '🏆 Mejor' : '💀 Peor';
+      return `
+        <div class="bw-item" style="border-color:${color}40">
+          <div class="bw-label" style="color:${color}">${label}</div>
+          <div class="bw-match">${h.match}</div>
+          <div class="bw-meta">${h.date} · ${h.sport} · @${parseFloat(h.odds).toFixed(2)}</div>
+          <div class="bw-profit" style="color:${color}">${h.profit >= 0 ? '+' : ''}$${h.profit.toLocaleString('es-CO')}</div>
+        </div>`;
+    };
+    bwEl.innerHTML = `<div class="best-worst-card">${bwItem(best,'best')}${bwItem(worst,'worst')}</div>`;
+  }
+
+  // ── RACHA ACTUAL ──────────────────────────────────────────────
+  const rachaEl = document.getElementById('racha-emoji');
+  const rachaText = document.getElementById('racha-texto');
+  const rachaSub = document.getElementById('racha-sub');
+  const rachaBadge = document.getElementById('racha-display');
+
+  if (resolved.length === 0) {
+    rachaEl.innerText = '—';
+    rachaText.innerText = 'Sin apuestas resueltas todavía';
+    rachaSub.innerText = '';
+  } else {
+    // Calcular racha actual (últimas apuestas consecutivas iguales)
+    let rachaCount = 1;
+    let rachaType = resolved[resolved.length - 1].result; // 'Ganada' o 'Perdida'
+    for (let i = resolved.length - 2; i >= 0; i--) {
+      if (resolved[i].result === rachaType) rachaCount++;
+      else break;
+    }
+
+    // Últimas 10 para mostrar puntos visuales
+    const last10 = resolved.slice(-10);
+    const dots = last10.map(h => {
+      const color = h.result === 'Ganada' ? 'var(--success)' : 'var(--danger)';
+      const letter = h.result === 'Ganada' ? 'G' : 'P';
+      return `<div class="racha-dot" style="background:${color}">${letter}</div>`;
+    }).join('');
+
+    if (rachaType === 'Ganada') {
+      rachaEl.innerText = rachaCount >= 3 ? '🔥' : '✅';
+      rachaText.innerText = `Racha ganadora de ${rachaCount} ${rachaCount === 1 ? 'apuesta' : 'apuestas'}`;
+      rachaText.style.color = 'var(--success)';
+      rachaSub.innerText = rachaCount >= 3 ? '¡Gran momento! Mantén la disciplina y no subas el stake.' : 'Vas bien. Sigue con tu plan.';
+    } else {
+      rachaEl.innerText = rachaCount >= 3 ? '❄️' : '❌';
+      rachaText.innerText = `Racha perdedora de ${rachaCount} ${rachaCount === 1 ? 'apuesta' : 'apuestas'}`;
+      rachaText.style.color = 'var(--danger)';
+      rachaSub.innerText = rachaCount >= 3 ? '⚠️ Momento de parar y revisar tu metodología.' : 'Normal en el proceso. Mantén el plan.';
+    }
+
+    // Dots últimas 10
+    let badgeDiv = document.getElementById('racha-dots');
+    if (!badgeDiv) {
+      badgeDiv = document.createElement('div');
+      badgeDiv.id = 'racha-dots';
+      badgeDiv.className = 'racha-badge';
+      rachaBadge.appendChild(badgeDiv);
+    }
+    badgeDiv.innerHTML = dots;
+  }
+
+  // ── RENDIMIENTO POR DEPORTE ────────────────────────────────────
+  const deportesEl = document.getElementById('analisis-deportes');
+  const sports = ['Fútbol', 'NBA', '🎰 Combinada'];
+  const sportData = sports.map(s => {
+    const bets = resolved.filter(h => h.sport === s || h.sport === s.replace('🎰 ', ''));
+    const won = bets.filter(h => h.result === 'Ganada').length;
+    const totalStake = bets.reduce((a, h) => a + h.money, 0);
+    const totalProfit = bets.reduce((a, h) => a + h.profit, 0);
+    const yield_ = totalStake > 0 ? (totalProfit / totalStake * 100) : null;
+    const wr = bets.length > 0 ? (won / bets.length * 100) : 0;
+    return { sport: s, count: bets.length, won, yield_, totalProfit, wr };
+  }).filter(s => s.count > 0);
+
+  if (sportData.length === 0) {
+    deportesEl.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:16px 0">Registra apuestas para ver estadísticas</p>';
+  } else {
+    deportesEl.innerHTML = sportData.map(s => {
+      const yieldColor = s.yield_ === null ? 'var(--text-muted)' : s.yield_ >= 0 ? 'var(--success)' : 'var(--danger)';
+      const yieldStr = s.yield_ === null ? 'N/A' : `${s.yield_ >= 0 ? '+' : ''}${s.yield_.toFixed(1)}%`;
+      const barPct = Math.min(s.wr, 100);
+      const barColor = s.wr >= 55 ? 'var(--success)' : s.wr >= 45 ? 'var(--void)' : 'var(--danger)';
+      return `
+        <div class="analisis-sport-row">
+          <div class="analisis-sport-head">
+            <span class="analisis-sport-name">${s.sport}</span>
+            <span class="analisis-sport-meta">${s.count} apuesta${s.count > 1 ? 's' : ''}</span>
+          </div>
+          <div class="analisis-bar-track">
+            <div class="analisis-bar-fill" style="width:${barPct}%; background:${barColor}"></div>
+          </div>
+          <div class="analisis-sport-stats">
+            <span>Acierto: <b>${s.wr.toFixed(0)}%</b></span>
+            <span>Yield: <b style="color:${yieldColor}">${yieldStr}</b></span>
+            <span>P&G: <b style="color:${s.totalProfit >= 0 ? 'var(--success)' : 'var(--danger)'}">${s.totalProfit >= 0 ? '+' : ''}$${s.totalProfit.toLocaleString('es-CO')}</b></span>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── RENDIMIENTO POR LIGA ───────────────────────────────────────
+  const ligasEl = document.getElementById('analisis-ligas');
+  // Extraer liga de las apuestas de fútbol del historial (no guardamos liga directamente, inferimos del match si hay datos)
+  // Como no guardamos liga, vamos a hacer stats por mercado en fútbol
+  const fbBets = resolved.filter(h => h.sport === 'Fútbol');
+  const markets = [...new Set(fbBets.map(h => {
+    // Intentar extraer el tipo de mercado del campo details
+    const d = h.details || '';
+    if (d.startsWith('Gana') || d.includes('Empate')) return '1X2';
+    if (d.includes('Goles')) return 'Total Goles';
+    if (d.includes('Corners')) return 'Corners';
+    if (d.includes('Tarjeta')) return 'Tarjetas';
+    if (d.includes('Hándicap')) return 'Hándicap';
+    if (d.includes('Ambos')) return 'Ambos Marcan';
+    return 'Otros';
+  }))];
+
+  const mktData = markets.map(m => {
+    const bets = fbBets.filter(h => {
+      const d = h.details || '';
+      if (m === '1X2') return d.startsWith('Gana') || d.includes('Empate');
+      if (m === 'Total Goles') return d.includes('Goles');
+      if (m === 'Corners') return d.includes('Corners');
+      if (m === 'Tarjetas') return d.includes('Tarjeta');
+      if (m === 'Hándicap') return d.includes('Hándicap');
+      if (m === 'Ambos Marcan') return d.includes('Ambos');
+      return true;
+    });
+    const won = bets.filter(h => h.result === 'Ganada').length;
+    const totalStake = bets.reduce((a, h) => a + h.money, 0);
+    const totalProfit = bets.reduce((a, h) => a + h.profit, 0);
+    const yield_ = totalStake > 0 ? (totalProfit / totalStake * 100) : null;
+    return { name: m, count: bets.length, won, yield_, totalProfit };
+  }).filter(m => m.count > 0).sort((a, b) => (b.yield_ || 0) - (a.yield_ || 0));
+
+  if (mktData.length === 0) {
+    ligasEl.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:16px 0">Sin apuestas de fútbol resueltas</p>';
+  } else {
+    ligasEl.innerHTML = `<p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px">Rendimiento por mercado en Fútbol</p>` +
+      mktData.map(m => {
+        const yieldColor = m.yield_ === null ? 'var(--text-muted)' : m.yield_ >= 0 ? 'var(--success)' : 'var(--danger)';
+        const yieldStr = m.yield_ === null ? 'N/A' : `${m.yield_ >= 0 ? '+' : ''}${m.yield_.toFixed(1)}%`;
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px dashed var(--border);">
+            <div>
+              <div style="font-weight:700; font-size:0.88rem">${m.name}</div>
+              <div style="font-size:0.72rem; color:var(--text-muted)">${m.count} apuesta${m.count > 1 ? 's' : ''} · ${m.won} ganadas</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:800; color:${yieldColor}; font-size:0.95rem">${yieldStr}</div>
+              <div style="font-size:0.72rem; color:${m.totalProfit >= 0 ? 'var(--success)' : 'var(--danger)'}">P&G ${m.totalProfit >= 0 ? '+' : ''}$${m.totalProfit.toLocaleString('es-CO')}</div>
+            </div>
+          </div>`;
+      }).join('');
+  }
+
+  // ── CONSEJOS DINÁMICOS ─────────────────────────────────────────
+  const consejosEl = document.getElementById('consejos-list');
+  const dynamicConsejos = [...CONSEJOS_FIJOS];
+
+  // Consejo dinámico basado en datos reales
+  if (resolved.length >= 5) {
+    const totalStakeAll = resolved.reduce((a, h) => a + h.money, 0);
+    const totalProfitAll = resolved.reduce((a, h) => a + h.profit, 0);
+    const globalYield = totalStakeAll > 0 ? (totalProfitAll / totalStakeAll * 100) : 0;
+    const wonAll = resolved.filter(h => h.result === 'Ganada').length;
+    const wrAll = wonAll / resolved.length * 100;
+
+    if (globalYield < -10) {
+      dynamicConsejos.unshift({ tipo: 'danger', titulo: '🚨 Tu yield está en zona negativa', texto: `Tu yield actual es ${globalYield.toFixed(1)}%. Considera hacer una pausa, revisar tu selección de apuestas y analizar en qué mercados estás fallando más.` });
+    } else if (globalYield > 10) {
+      dynamicConsejos.unshift({ tipo: 'success', titulo: '🌟 Yield excelente', texto: `Tienes un yield del ${globalYield.toFixed(1)}%. ¡Muy bien! Mantén la disciplina, no subas el stake por confianza excesiva.` });
+    }
+
+    if (wrAll < 40) {
+      dynamicConsejos.unshift({ tipo: 'warning', titulo: '📉 Tasa de acierto baja', texto: `Estás acertando el ${wrAll.toFixed(0)}% de tus apuestas. Puede ser normal si apuestas cuotas altas, pero si no es intencional, revisa tu metodología de selección.` });
+    }
+  }
+
+  // Consejo si no hay bank inicial
+  if (!appData.initialBank) {
+    dynamicConsejos.unshift({ tipo: 'warning', titulo: '⚙️ Define tu Bankroll inicial', texto: 'Ve a Inicio y establece tu bankroll para que el sistema de stakes funcione correctamente con Flat Staking.' });
+  }
+
+  consejosEl.innerHTML = dynamicConsejos.map(c =>
+    `<div class="consejo-card ${c.tipo}"><h4>${c.titulo}</h4><p>${c.texto}</p></div>`
+  ).join('');
+}
+
+// ─── COMBINADA ────────────────────────────────────────────────────
+let combiSelections = [];
+
+function addCombiSelection() {
+  const idx = combiSelections.length;
+  combiSelections.push({ match: '', pick: '', odds: '', sport: 'Fútbol' });
+
+  const container = document.getElementById('combi-selections');
+  const div = document.createElement('div');
+  div.className = 'combi-sel-card';
+  div.id = `combi-sel-${idx}`;
+
+  // Build football leagues options
+  const leagueOpts = Object.keys(DB.football).map(l => `<option value="${l}">${l}</option>`).join('');
+  // Build NBA team options
+  const nbaOpts = DB.nba.sort().map(t => `<option value="${t}">${t}</option>`).join('');
+
+  div.innerHTML = `
+    <div class="combi-num">SELECCIÓN ${idx + 1}</div>
+    <button class="remove-btn" onclick="removeCombiSelection(${idx})" title="Eliminar">✕</button>
+    <div style="margin-top:10px">
+      <label>Deporte</label>
+      <select onchange="onCombiSportChange(this, ${idx})" id="combi-sport-${idx}" style="margin-bottom:10px">
+        <option value="Fútbol">⚽ Fútbol</option>
+        <option value="NBA">🏀 NBA</option>
+      </select>
+
+      <div id="combi-teams-${idx}">
+        <label>Liga</label>
+        <select id="combi-league-${idx}" onchange="loadCombiTeams(${idx})" style="margin-bottom:8px">
+          ${leagueOpts}
+        </select>
+        <div style="display:flex; gap:8px">
+          <div style="flex:1">
+            <label>Local</label>
+            <select id="combi-local-${idx}" onchange="updateCombiMatch(${idx})" style="margin-bottom:8px"></select>
+          </div>
+          <div style="flex:1">
+            <label>Visitante</label>
+            <select id="combi-away-${idx}" onchange="updateCombiMatch(${idx})" style="margin-bottom:8px"></select>
+          </div>
+        </div>
+      </div>
+
+      <label>Tu Selección (Pick)</label>
+      <input type="text" placeholder="Ej: Gana Real Madrid, Más de 2.5..." oninput="combiSelections[${idx}].pick=this.value" id="combi-pick-${idx}">
+      <label>Cuota de esta selección (@)</label>
+      <input type="number" step="0.01" placeholder="Ej: 1.80" id="combi-odds-${idx}" oninput="combiSelections[${idx}].odds=parseFloat(this.value)||''; updateCombiOdds()">
+    </div>`;
+  container.appendChild(div);
+
+  // Load teams for first league by default
+  loadCombiTeams(idx);
+  updateCombiOdds();
+}
+
+function onCombiSportChange(sel, idx) {
+  combiSelections[idx].sport = sel.value;
+  const teamsDiv = document.getElementById(`combi-teams-${idx}`);
+  const nbaOpts = DB.nba.sort().map(t => `<option value="${t}">${t}</option>`).join('');
+  const leagueOpts = Object.keys(DB.football).map(l => `<option value="${l}">${l}</option>`).join('');
+
+  if (sel.value === 'NBA') {
+    teamsDiv.innerHTML = `
+      <div style="display:flex; gap:8px">
+        <div style="flex:1">
+          <label>Local</label>
+          <select id="combi-local-${idx}" onchange="updateCombiMatch(${idx})" style="margin-bottom:8px">${nbaOpts}</select>
+        </div>
+        <div style="flex:1">
+          <label>Visitante</label>
+          <select id="combi-away-${idx}" onchange="updateCombiMatch(${idx})" style="margin-bottom:8px">${nbaOpts}</select>
+        </div>
+      </div>`;
+  } else {
+    teamsDiv.innerHTML = `
+      <label>Liga</label>
+      <select id="combi-league-${idx}" onchange="loadCombiTeams(${idx})" style="margin-bottom:8px">${leagueOpts}</select>
+      <div style="display:flex; gap:8px">
+        <div style="flex:1">
+          <label>Local</label>
+          <select id="combi-local-${idx}" onchange="updateCombiMatch(${idx})" style="margin-bottom:8px"></select>
+        </div>
+        <div style="flex:1">
+          <label>Visitante</label>
+          <select id="combi-away-${idx}" onchange="updateCombiMatch(${idx})" style="margin-bottom:8px"></select>
+        </div>
+      </div>`;
+    loadCombiTeams(idx);
+  }
+  updateCombiMatch(idx);
+}
+
+function loadCombiTeams(idx) {
+  const leagueEl = document.getElementById(`combi-league-${idx}`);
+  if (!leagueEl) return;
+  const league = leagueEl.value;
+  const teams = DB.football[league] || [];
+  const opts = teams.map(t => `<option value="${t}">${t}</option>`).join('');
+  const localEl = document.getElementById(`combi-local-${idx}`);
+  const awayEl  = document.getElementById(`combi-away-${idx}`);
+  if (localEl) localEl.innerHTML = opts;
+  if (awayEl)  awayEl.innerHTML  = opts;
+  updateCombiMatch(idx);
+}
+
+function updateCombiMatch(idx) {
+  const local = document.getElementById(`combi-local-${idx}`)?.value || '';
+  const away  = document.getElementById(`combi-away-${idx}`)?.value  || '';
+  if (local && away) combiSelections[idx].match = `${local} vs ${away}`;
+}
+
+function removeCombiSelection(idx) {
+  if (combiSelections.length <= 1) return alert("Una combinada necesita al menos una selección.");
+  combiSelections.splice(idx, 1);
+  // Redibujar todas las tarjetas
+  document.getElementById('combi-selections').innerHTML = '';
+  const temp = [...combiSelections];
+  combiSelections = [];
+  temp.forEach((s, i) => {
+    addCombiSelection();
+    // Restaurar valores
+    const card = document.getElementById(`combi-sel-${i}`);
+    card.querySelectorAll('input')[0].value = s.match;
+    card.querySelectorAll('input')[1].value = s.pick;
+    card.querySelectorAll('input')[2].value = s.odds;
+    combiSelections[i] = { ...s };
+  });
+  updateCombiOdds();
+}
+
+function updateCombiOdds() {
+  const stake = document.getElementById('combi-stake').value;
+  const pct = stake * 2; // 2% por unidad
+  document.getElementById('combi-stake-val').innerText = stake;
+  document.getElementById('combi-stake-pct').innerText = `${pct}%`;
+
+  const base = appData.initialBank || appData.bank;
+  const money = Math.round(base * (pct / 100));
+  document.getElementById('combi-money').value = money || '';
+
+  const validOdds = combiSelections.filter(s => s.odds > 0);
+  const totalOdds = validOdds.reduce((acc, s) => acc * s.odds, 1);
+  const potential = money ? Math.round(money * totalOdds) : 0;
+  const count = combiSelections.length;
+
+  const summary = document.getElementById('combi-summary');
+  if (count > 0) {
+    summary.style.display = 'block';
+    document.getElementById('combi-count').innerText = `${count} ${count === 1 ? 'selección' : 'selecciones'}`;
+    document.getElementById('combi-total-odds').innerText = totalOdds.toFixed(2);
+    document.getElementById('combi-potential').innerText = potential > 0 ? `$${potential.toLocaleString('es-CO')}` : '$0';
+  } else {
+    summary.style.display = 'none';
+  }
+}
+
+function saveCombi() {
+  const money  = parseFloat(document.getElementById('combi-money').value);
+  const result = document.getElementById('combi-result').value;
+  const stake  = document.getElementById('combi-stake').value;
+  const notes  = document.getElementById('combi-notes').value.trim();
+
+  // Sync matches from selectors before validating
+  combiSelections.forEach((s, i) => updateCombiMatch(i));
+
+  const validSels = combiSelections.filter(s => s.match && s.pick && s.odds > 0);
+  if (validSels.length < 2) return alert("⚠️ Una combinada necesita al menos 2 selecciones completas (partido, pick y cuota).");
+  if (!money) return alert("⚠️ Establece tu Bankroll primero para calcular el monto.");
+
+  const totalOdds = parseFloat(validSels.reduce((acc, s) => acc * s.odds, 1).toFixed(2));
+
+  let profit = 0;
+  if (result === 'Ganada') {
+    profit = Math.round(money * totalOdds - money);
+    appData.bank += profit;
+  } else if (result === 'Perdida') {
+    profit = -money;
+    appData.bank -= money;
+  }
+
+  appData.history.push({
+    id: Date.now(),
+    type: 'Combinada',
+    sport: '🎰 Combinada',
+    match: `Combinada ${validSels.length} selecciones`,
+    details: `Cuota total: @${totalOdds}`,
+    notes,
+    selections: validSels.map(s => ({ match: s.match, pick: s.pick, odds: s.odds, sport: s.sport })),
+    totalOdds,
+    stake,
+    odds: totalOdds,
+    money,
+    result,
+    profit,
+    date: new Date().toLocaleDateString('es-CO')
+  });
+
+  saveUserData();
+  clearCombi();
+  updateQuickStats();
+  drawChart();
+  alert(`✅ Combinada guardada!\nCuota total: @${totalOdds}\nBankroll: $${appData.bank.toLocaleString('es-CO')}`);
+}
+
+function clearCombi() {
+  combiSelections = [];
+  document.getElementById('combi-selections').innerHTML = '';
+  document.getElementById('combi-result').value = 'Pendiente';
+  document.getElementById('combi-stake').value = 1;
+  document.getElementById('combi-notes').value = '';
+  document.getElementById('combi-summary').style.display = 'none';
+  addCombiSelection();
+}
+</script>
+</body>
+</html>
